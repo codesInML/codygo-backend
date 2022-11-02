@@ -1,0 +1,33 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Brand {
+  id        String   @id @default(uuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Hotel     Hotel[]
+}
+
+model Hotel {
+  id        String   @id @default(uuid())
+  name      String
+  city      String
+  country   String
+  address   String
+  ratings   Int
+  price     String
+  brand     Brand?   @relation(fields: [brandID], references: [id])
+  brandID   String?  @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
