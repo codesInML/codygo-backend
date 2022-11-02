@@ -23,3 +23,7 @@ export const updateBrandService = async (
 export const deleteBrandService = async (name: string): Promise<void> => {
   await prisma.brand.delete({ where: { name } });
 };
+
+export const findBrandByID = async (id: string): Promise<Brand | null> => {
+  return await prisma.brand.findUnique({ where: { id } });
+};

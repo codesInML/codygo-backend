@@ -24,7 +24,7 @@ model Hotel {
   city      String
   country   String
   address   String
-  ratings   Int
+  ratings   Float
   price     String
   brand     Brand?   @relation(fields: [brandID], references: [id])
   brandID   String?  @unique
