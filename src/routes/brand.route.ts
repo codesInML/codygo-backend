@@ -7,7 +7,7 @@ import {
   updateBrandController,
 } from "../controllers";
 import { validateRequestMiddleware } from "../helpers";
-import { createBrandSchema, updateBrandSchema } from "../schema/brand.schema";
+import { createBrandSchema, updateBrandSchema } from "../schema";
 
 const router = Router();
 

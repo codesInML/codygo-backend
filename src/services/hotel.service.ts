@@ -14,3 +14,11 @@ export const createHotelService = async (
 
   return await prisma.hotel.create({ data });
 };
+
+export const getAllHotelService = async (): Promise<Hotel[]> => {
+  return prisma.hotel.findMany();
+};
+
+export const findHotelByID = async (id: string): Promise<Hotel | null> => {
+  return prisma.hotel.findUnique({ where: { id } });
+};

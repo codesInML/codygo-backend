@@ -1,12 +1,19 @@
 import { Router } from "express";
-import { createHotelController } from "../controllers/hotel.controller";
+import {
+  createHotelController,
+  getAllHotelController,
+  getHotelController,
+} from "../controllers/hotel.controller";
 import { validateRequestMiddleware } from "../helpers";
-import { createHotelSchema } from "../schema/hotel.schema";
+import { createHotelSchema } from "../schema";
 
 const router = Router();
 
 router
   .route("/")
-  .post(createHotelSchema(), validateRequestMiddleware, createHotelController);
+  .post(createHotelSchema(), validateRequestMiddleware, createHotelController)
+  .get(getAllHotelController);
+
+router.route("/:hotelID").get(getHotelController);
 
 export { router as hotelRoutes };

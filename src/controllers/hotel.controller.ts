@@ -3,8 +3,12 @@ import { Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError } from "../errors";
 import { successResponse } from "../helpers";
-import { findBrandByID } from "../services";
-import { createHotelService } from "../services/hotel.service";
+import {
+  createHotelService,
+  findBrandByID,
+  findHotelByID,
+  getAllHotelService,
+} from "../services";
 
 export const createHotelController = async (req: Request, res: Response) => {
   const { name, city, country, address, ratings, price, brandID } = req.body;
@@ -33,4 +37,19 @@ export const createHotelController = async (req: Request, res: Response) => {
   }
 
   return successResponse(res, StatusCodes.CREATED, hotel);
+};
+
+export const getAllHotelController = async (req: Request, res: Response) => {
+  const hotels = await getAllHotelService();
+  return successResponse(res, StatusCodes.OK, hotels);
+};
+
+export const getHotelController = async (req: Request, res: Response) => {
+  const { hotelID } = req.params;
+
+  const hotel = await findHotelByID(hotelID);
+
+  if (!hotel) throw new BadRequestError("Invalid hotel ID");
+
+  return successResponse(res, StatusCodes.OK, hotel);
 };
