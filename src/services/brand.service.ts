@@ -19,3 +19,7 @@ export const updateBrandService = async (
 ): Promise<Brand> => {
   return await prisma.brand.update({ where: { name }, data });
 };
+
+export const deleteBrandService = async (name: string): Promise<void> => {
+  await prisma.brand.delete({ where: { name } });
+};

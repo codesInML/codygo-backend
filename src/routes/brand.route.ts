@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createBrandController,
+  deleteBrandController,
   getABrandController,
   getAllBrandsController,
   updateBrandController,
@@ -14,7 +15,8 @@ router
   .route("/")
   .post(createBrandSchema(), validateRequestMiddleware, createBrandController)
   .get(getAllBrandsController)
-  .patch(updateBrandSchema(), validateRequestMiddleware, updateBrandController);
+  .patch(updateBrandSchema(), validateRequestMiddleware, updateBrandController)
+  .delete(deleteBrandController);
 
 router.route("/:name").get(getABrandController);
 

@@ -4,6 +4,7 @@ import { BadRequestError, RequestValidationError } from "../errors";
 import { successResponse } from "../helpers";
 import {
   createBrandService,
+  deleteBrandService,
   getABrandService,
   getAllBrandService,
   updateBrandService,
@@ -40,4 +41,15 @@ export const updateBrandController = async (req: Request, res: Response) => {
   brand = await updateBrandService(brandName, { name });
 
   return successResponse(res, StatusCodes.CREATED, brand);
+};
+
+export const deleteBrandController = async (req: Request, res: Response) => {
+  const { name } = req.body;
+  let brand = await getABrandService(name);
+
+  if (!brand)
+    throw new BadRequestError(`Brand with name ${name} does not exist`);
+
+  await deleteBrandService(name);
+  return successResponse(res, StatusCodes.OK);
 };
