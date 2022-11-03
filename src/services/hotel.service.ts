@@ -17,8 +17,14 @@ export const createHotelService = async (
   return await prisma.hotel.create({ data });
 };
 
-export const getAllHotelService = async (): Promise<Hotel[]> => {
-  return prisma.hotel.findMany();
+export const getAllHotelService = async (
+  skip: number,
+  limit: number
+): Promise<Hotel[]> => {
+  return prisma.hotel.findMany({
+    skip,
+    take: limit,
+  });
 };
 
 export const findHotelByID = async (id: string): Promise<Hotel | null> => {

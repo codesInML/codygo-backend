@@ -42,7 +42,9 @@ export const createHotelController = async (req: Request, res: Response) => {
 };
 
 export const getAllHotelController = async (req: Request, res: Response) => {
-  const hotels = await getAllHotelService();
+  const { page = 1, limit = 10 } = req.query;
+  const skip = (+page - 1) * +limit;
+  const hotels = await getAllHotelService(skip, +limit);
   return successResponse(res, StatusCodes.OK, hotels);
 };
 
