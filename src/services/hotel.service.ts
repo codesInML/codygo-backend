@@ -22,3 +22,10 @@ export const getAllHotelService = async (): Promise<Hotel[]> => {
 export const findHotelByID = async (id: string): Promise<Hotel | null> => {
   return prisma.hotel.findUnique({ where: { id } });
 };
+
+export const updateHotelService = async (
+  data: Partial<HotelPayload> & { brandID?: string },
+  id: string
+): Promise<Hotel> => {
+  return await prisma.hotel.update({ where: { id }, data });
+};

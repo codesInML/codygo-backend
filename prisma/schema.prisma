@@ -19,15 +19,26 @@ model Brand {
 }
 
 model Hotel {
-  id        String   @id @default(uuid())
+  id        String        @id @default(uuid())
   name      String
   city      String
   country   String
   address   String
   ratings   Float
   price     String
-  brand     Brand?   @relation(fields: [brandID], references: [id])
-  brandID   String?  @unique
+  brand     Brand?        @relation(fields: [brandID], references: [id])
+  brandID   String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  images    HotelImages[]
+}
+
+model HotelImages {
+  id        String   @id @default(uuid())
+  image     String
+  isMain    Boolean
+  hotel     Hotel    @relation(fields: [hotelID], references: [id])
+  hotelID   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

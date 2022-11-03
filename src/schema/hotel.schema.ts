@@ -1,4 +1,4 @@
-import { body } from "express-validator";
+import { body, oneOf } from "express-validator";
 
 export const createHotelSchema = () => {
   return [
@@ -8,5 +8,19 @@ export const createHotelSchema = () => {
     body("address").notEmpty().withMessage("Please provide hotel address"),
     body("price").notEmpty().withMessage("Please provide hotel price"),
     body("ratings").notEmpty().withMessage("Please provide hotel ratings"),
+  ];
+};
+
+export const updateHotelSchema = () => {
+  return [
+    oneOf([
+      body("name").exists().isString(),
+      body("city").exists().isString(),
+      body("country").exists().isString(),
+      body("address").exists().isString(),
+      body("price").exists().isString(),
+      body("ratings").exists().isString(),
+      body("brandID").exists().isString(),
+    ]),
   ];
 };

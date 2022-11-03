@@ -3,9 +3,10 @@ import {
   createHotelController,
   getAllHotelController,
   getHotelController,
-} from "../controllers/hotel.controller";
+  updateHotelController,
+} from "../controllers";
 import { validateRequestMiddleware } from "../helpers";
-import { createHotelSchema } from "../schema";
+import { createHotelSchema, updateHotelSchema } from "../schema";
 
 const router = Router();
 
@@ -14,6 +15,9 @@ router
   .post(createHotelSchema(), validateRequestMiddleware, createHotelController)
   .get(getAllHotelController);
 
-router.route("/:hotelID").get(getHotelController);
+router
+  .route("/:hotelID")
+  .get(getHotelController)
+  .patch(updateHotelSchema(), validateRequestMiddleware, updateHotelController);
 
 export { router as hotelRoutes };

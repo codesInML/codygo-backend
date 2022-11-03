@@ -8,6 +8,7 @@ import {
   findBrandByID,
   findHotelByID,
   getAllHotelService,
+  updateHotelService,
 } from "../services";
 
 export const createHotelController = async (req: Request, res: Response) => {
@@ -52,4 +53,19 @@ export const getHotelController = async (req: Request, res: Response) => {
   if (!hotel) throw new BadRequestError("Invalid hotel ID");
 
   return successResponse(res, StatusCodes.OK, hotel);
+};
+
+export const updateHotelController = async (req: Request, res: Response) => {
+  const { hotelID } = req.params;
+  const { name, city, country, address, ratings, price, brandID } = req.body;
+
+  let hotel = await findHotelByID(hotelID);
+
+  if (!hotel) throw new BadRequestError("Invalid hotel ID");
+
+  hotel = await updateHotelService(
+    { name, city, address, ratings, price, brandID },
+    hotelID
+  );
+  return successResponse(res, StatusCodes.CREATED, hotel);
 };
