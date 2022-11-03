@@ -5,6 +5,7 @@ import { BadRequestError } from "../errors";
 import { successResponse } from "../helpers";
 import {
   createHotelService,
+  deleteHotelService,
   findBrandByID,
   findHotelByID,
   getAllHotelService,
@@ -64,8 +65,19 @@ export const updateHotelController = async (req: Request, res: Response) => {
   if (!hotel) throw new BadRequestError("Invalid hotel ID");
 
   hotel = await updateHotelService(
-    { name, city, address, ratings, price, brandID },
+    { name, city, country, address, ratings, price, brandID },
     hotelID
   );
   return successResponse(res, StatusCodes.CREATED, hotel);
+};
+
+export const deleteHotelController = async (req: Request, res: Response) => {
+  const { hotelID } = req.params;
+
+  let hotel = await findHotelByID(hotelID);
+
+  if (!hotel) throw new BadRequestError("Invalid hotel ID");
+
+  await deleteHotelService(hotelID);
+  return successResponse(res, StatusCodes.OK);
 };

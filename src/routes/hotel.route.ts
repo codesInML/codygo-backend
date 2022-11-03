@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createHotelController,
+  deleteHotelController,
   getAllHotelController,
   getHotelController,
   updateHotelController,
@@ -18,6 +19,7 @@ router
 router
   .route("/:hotelID")
   .get(getHotelController)
-  .patch(updateHotelSchema(), validateRequestMiddleware, updateHotelController);
+  .patch(updateHotelSchema(), validateRequestMiddleware, updateHotelController)
+  .delete(deleteHotelController);
 
 export { router as hotelRoutes };

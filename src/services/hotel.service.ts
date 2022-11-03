@@ -3,6 +3,8 @@ import { prisma } from "../client";
 
 type HotelPayload = Omit<Hotel, "id" | "brandID" | "createdAt" | "updatedAt">;
 
+type UpdateHotelPayload = Partial<HotelPayload> & { brandID?: string };
+
 export const createHotelService = async (
   data: HotelPayload,
   brandID?: string
@@ -24,8 +26,12 @@ export const findHotelByID = async (id: string): Promise<Hotel | null> => {
 };
 
 export const updateHotelService = async (
-  data: Partial<HotelPayload> & { brandID?: string },
+  data: UpdateHotelPayload,
   id: string
 ): Promise<Hotel> => {
   return await prisma.hotel.update({ where: { id }, data });
+};
+
+export const deleteHotelService = async (id: string): Promise<void> => {
+  await prisma.hotel.delete({ where: { id } });
 };
