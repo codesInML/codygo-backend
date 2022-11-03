@@ -7,11 +7,12 @@ type UpdateHotelPayload = Partial<HotelPayload> & { brandID?: string };
 
 export const createHotelService = async (
   data: HotelPayload,
+  images: { image: string; isMain: boolean }[],
   brandID?: string
 ): Promise<Hotel> => {
   if (brandID)
     return await prisma.hotel.create({
-      data: { ...data, brandID },
+      data: { ...data, brandID, images: { create: images } },
     });
 
   return await prisma.hotel.create({ data });
@@ -19,12 +20,33 @@ export const createHotelService = async (
 
 export const getAllHotelService = async (
   skip: number,
-  limit: number
-): Promise<Hotel[]> => {
-  return prisma.hotel.findMany({
-    skip,
-    take: limit,
-  });
+  limit: number,
+  orderBy?: "price" | "ratings"
+): Promise<{ hotels: Hotel[]; totalPages: number }> => {
+  if (orderBy == "price") {
+    const hotels = await prisma.hotel.findMany({
+      skip,
+      take: limit,
+      orderBy: { price: "desc" },
+    });
+    const count = await prisma.hotel.count();
+    return { hotels, totalPages: Math.ceil(count / limit) };
+  } else if (orderBy == "ratings") {
+    const hotels = await prisma.hotel.findMany({
+      skip,
+      take: limit,
+      orderBy: { ratings: "desc" },
+    });
+    const count = await prisma.hotel.count();
+    return { hotels, totalPages: Math.ceil(count / limit) };
+  } else {
+    const hotels = await prisma.hotel.findMany({
+      skip,
+      take: limit,
+    });
+    const count = await prisma.hotel.count();
+    return { hotels, totalPages: Math.ceil(count / limit) };
+  }
 };
 
 export const findHotelByID = async (id: string): Promise<Hotel | null> => {

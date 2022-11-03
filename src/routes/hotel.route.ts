@@ -7,13 +7,19 @@ import {
   updateHotelController,
 } from "../controllers";
 import { validateRequestMiddleware } from "../helpers";
+import { hotelImagesUploader } from "../middleware";
 import { createHotelSchema, updateHotelSchema } from "../schema";
 
 const router = Router();
 
 router
   .route("/")
-  .post(createHotelSchema(), validateRequestMiddleware, createHotelController)
+  .post(
+    hotelImagesUploader(),
+    createHotelSchema(),
+    validateRequestMiddleware,
+    createHotelController
+  )
   .get(getAllHotelController);
 
 router

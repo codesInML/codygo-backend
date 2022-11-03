@@ -1,8 +1,9 @@
 import { Brand, Hotel } from "@prisma/client";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError } from "../errors";
-import { successResponse } from "../helpers";
+import { deleteUpload, successResponse } from "../helpers";
+import { uploadPublicImage } from "../middleware";
 import {
   createHotelService,
   deleteHotelService,
@@ -12,8 +13,58 @@ import {
   updateHotelService,
 } from "../services";
 
-export const createHotelController = async (req: Request, res: Response) => {
+export const createHotelController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   const { name, city, country, address, ratings, price, brandID } = req.body;
+
+  let featuredImage: { image: string; isMain: boolean };
+  let otherImages: { image: string; isMain: boolean }[];
+  let files = req.files as { [fieldname: string]: Express.Multer.File[] };
+
+  // check that files are present
+  if (
+    !Object.keys(files).includes("featuredImage") &&
+    !Object.keys(files).includes("otherImages")
+  )
+    throw new BadRequestError("Please provide the images");
+  if (!Object.keys(files).includes("featuredImage")) {
+    files["otherImages"].map((image) => {
+      deleteUpload(image.path, next);
+    });
+    throw new BadRequestError("Please provide a featured image");
+  }
+  if (!Object.keys(files).includes("otherImages")) {
+    deleteUpload(files["featuredImage"][0].path, next);
+    throw new BadRequestError("Please provide other images");
+  }
+
+  // upload files to S3 and format to be saved in DB
+  featuredImage = {
+    image:
+      process.env.AWS_PUBLIC_CATEGORY! +
+      "/" +
+      files["featuredImage"][0].filename,
+    isMain: true,
+  };
+  await uploadPublicImage(files["featuredImage"][0]);
+  deleteUpload(files["featuredImage"][0].path, next);
+
+  otherImages = files["otherImages"].map(
+    (image): { image: string; isMain: boolean } => {
+      uploadPublicImage(image).then(() => {
+        deleteUpload(image.path, next);
+      });
+      return {
+        image: process.env.AWS_PUBLIC_CATEGORY! + "/" + image.filename,
+        isMain: false,
+      };
+    }
+  );
+
+  const images = [featuredImage, ...otherImages];
 
   let brand: Brand | null;
   let hotel: Hotel;
@@ -25,27 +76,41 @@ export const createHotelController = async (req: Request, res: Response) => {
 
     hotel = await createHotelService(
       { name, city, country, address, ratings, price },
+      images,
       brand.id
     );
   } else {
-    hotel = await createHotelService({
-      name,
-      city,
-      country,
-      address,
-      ratings,
-      price,
-    });
+    hotel = await createHotelService(
+      {
+        name,
+        city,
+        country,
+        address,
+        ratings,
+        price,
+      },
+      images
+    );
   }
 
   return successResponse(res, StatusCodes.CREATED, hotel);
 };
 
 export const getAllHotelController = async (req: Request, res: Response) => {
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 100, orderBy } = req.query;
   const skip = (+page - 1) * +limit;
-  const hotels = await getAllHotelService(skip, +limit);
-  return successResponse(res, StatusCodes.OK, hotels);
+  let data: {
+    hotels: Hotel[];
+    totalPages: number;
+  };
+
+  if (orderBy == "price" || orderBy == "ratings") {
+    data = await getAllHotelService(skip, +limit, orderBy);
+  } else {
+    data = await getAllHotelService(skip, +limit);
+  }
+
+  return successResponse(res, StatusCodes.OK, { ...data, currentPage: +page });
 };
 
 export const getHotelController = async (req: Request, res: Response) => {
