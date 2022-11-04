@@ -1,4 +1,4 @@
-import { body, oneOf } from "express-validator";
+import { body, check, oneOf } from "express-validator";
 
 export const createHotelSchema = () => {
   return [
@@ -22,5 +22,14 @@ export const updateHotelSchema = () => {
       body("ratings").exists().isString(),
       body("brandID").exists().isString(),
     ]),
+  ];
+};
+
+export const filterHotelByBrandSchema = () => {
+  return [
+    check("brands.*").isString().notEmpty(),
+    body("brands")
+      .isArray({ min: 1 })
+      .withMessage("please provide filter parameters"),
   ];
 };

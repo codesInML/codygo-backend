@@ -3,10 +3,12 @@ import { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { BadRequestError } from "../errors";
 import { deleteUpload, successResponse } from "../helpers";
+import Logger from "../logger";
 import { uploadPublicImage } from "../middleware";
 import {
   createHotelService,
   deleteHotelService,
+  filterHotelByBrandService,
   findBrandByID,
   findHotelByID,
   getAllHotelService,
@@ -65,6 +67,7 @@ export const createHotelController = async (
   );
 
   const images = [featuredImage, ...otherImages];
+  Logger.info({ images });
 
   let brand: Brand | null;
   let hotel: Hotel;
@@ -75,7 +78,7 @@ export const createHotelController = async (
     if (!brand) throw new BadRequestError(`Invalid brand ID`);
 
     hotel = await createHotelService(
-      { name, city, country, address, ratings, price },
+      { name, city, country, address, ratings: +ratings, price },
       images,
       brand.id
     );
@@ -86,7 +89,7 @@ export const createHotelController = async (
         city,
         country,
         address,
-        ratings,
+        ratings: +ratings,
         price,
       },
       images
@@ -147,4 +150,13 @@ export const deleteHotelController = async (req: Request, res: Response) => {
 
   await deleteHotelService(hotelID);
   return successResponse(res, StatusCodes.OK);
+};
+
+export const filterHotelByBrandController = async (
+  req: Request,
+  res: Response
+) => {
+  const { brands } = req.body;
+  const data = await filterHotelByBrandService(brands);
+  return successResponse(res, StatusCodes.OK, data);
 };

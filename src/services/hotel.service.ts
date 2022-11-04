@@ -15,7 +15,9 @@ export const createHotelService = async (
       data: { ...data, brandID, images: { create: images } },
     });
 
-  return await prisma.hotel.create({ data });
+  return await prisma.hotel.create({
+    data: { ...data, images: { create: images } },
+  });
 };
 
 export const getAllHotelService = async (
@@ -25,6 +27,7 @@ export const getAllHotelService = async (
 ): Promise<{ hotels: Hotel[]; totalPages: number }> => {
   if (orderBy == "price") {
     const hotels = await prisma.hotel.findMany({
+      include: { images: { where: { isMain: true } } },
       skip,
       take: limit,
       orderBy: { price: "desc" },
@@ -33,6 +36,7 @@ export const getAllHotelService = async (
     return { hotels, totalPages: Math.ceil(count / limit) };
   } else if (orderBy == "ratings") {
     const hotels = await prisma.hotel.findMany({
+      include: { images: { where: { isMain: true } } },
       skip,
       take: limit,
       orderBy: { ratings: "desc" },
@@ -41,6 +45,7 @@ export const getAllHotelService = async (
     return { hotels, totalPages: Math.ceil(count / limit) };
   } else {
     const hotels = await prisma.hotel.findMany({
+      include: { images: { where: { isMain: true } } },
       skip,
       take: limit,
     });
@@ -50,7 +55,7 @@ export const getAllHotelService = async (
 };
 
 export const findHotelByID = async (id: string): Promise<Hotel | null> => {
-  return prisma.hotel.findUnique({ where: { id } });
+  return prisma.hotel.findUnique({ where: { id }, include: { images: true } });
 };
 
 export const updateHotelService = async (
@@ -61,5 +66,15 @@ export const updateHotelService = async (
 };
 
 export const deleteHotelService = async (id: string): Promise<void> => {
+  await prisma.hotelImages.deleteMany({ where: { hotelID: id } });
   await prisma.hotel.delete({ where: { id } });
+};
+
+export const filterHotelByBrandService = async (
+  brands: string[]
+): Promise<Hotel[]> => {
+  return await prisma.hotel.findMany({
+    where: { brandID: { in: brands } },
+    include: { images: { where: { isMain: true } } },
+  });
 };

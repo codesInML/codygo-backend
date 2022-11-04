@@ -2,13 +2,18 @@ import { Router } from "express";
 import {
   createHotelController,
   deleteHotelController,
+  filterHotelByBrandController,
   getAllHotelController,
   getHotelController,
   updateHotelController,
 } from "../controllers";
 import { validateRequestMiddleware } from "../helpers";
 import { hotelImagesUploader } from "../middleware";
-import { createHotelSchema, updateHotelSchema } from "../schema";
+import {
+  createHotelSchema,
+  filterHotelByBrandSchema,
+  updateHotelSchema,
+} from "../schema";
 
 const router = Router();
 
@@ -21,6 +26,14 @@ router
     createHotelController
   )
   .get(getAllHotelController);
+
+router
+  .route("/filter")
+  .post(
+    filterHotelByBrandSchema(),
+    validateRequestMiddleware,
+    filterHotelByBrandController
+  );
 
 router
   .route("/:hotelID")
