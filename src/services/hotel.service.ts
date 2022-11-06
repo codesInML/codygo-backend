@@ -68,7 +68,13 @@ export const getAllHotelService = async (
 };
 
 export const findHotelByID = async (id: string): Promise<Hotel | null> => {
-  return prisma.hotel.findUnique({ where: { id }, include: { images: true } });
+  return prisma.hotel.findUnique({
+    where: { id },
+    include: {
+      images: { orderBy: { isMain: "desc" } },
+      brand: { select: { name: true } },
+    },
+  });
 };
 
 export const updateHotelService = async (
