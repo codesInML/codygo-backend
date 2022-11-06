@@ -8,6 +8,9 @@ export const createHotelSchema = () => {
     body("address").notEmpty().withMessage("Please provide hotel address"),
     body("price").notEmpty().withMessage("Please provide hotel price"),
     body("ratings").notEmpty().withMessage("Please provide hotel ratings"),
+    body("number_of_ratings")
+      .notEmpty()
+      .withMessage("Please provide hotel number_of_ratings"),
   ];
 };
 
@@ -17,6 +20,7 @@ export const updateHotelSchema = () => {
       body("name").exists().isString(),
       body("city").exists().isString(),
       body("country").exists().isString(),
+      body("number_of_ratings").isString(),
       body("address").exists().isString(),
       body("price").exists().isString(),
       body("ratings").exists().isString(),

@@ -6,7 +6,7 @@ export const createBrandService = async (name: string): Promise<Brand> => {
 };
 
 export const getAllBrandService = async (): Promise<Brand[]> => {
-  return await prisma.brand.findMany();
+  return await prisma.brand.findMany({ include: { hotel: true } });
 };
 
 export const getABrandService = async (name: string): Promise<Brand | null> => {
@@ -21,6 +21,11 @@ export const updateBrandService = async (
 };
 
 export const deleteBrandService = async (name: string): Promise<void> => {
+  const brand = await prisma.brand.findUnique({ where: { name } });
+  await prisma.hotel.updateMany({
+    where: { brandID: brand?.id },
+    data: { brandID: null },
+  });
   await prisma.brand.delete({ where: { name } });
 };
 

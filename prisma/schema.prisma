@@ -15,22 +15,23 @@ model Brand {
   name      String   @unique
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  Hotel     Hotel[]
+  hotel     Hotel[]
 }
 
 model Hotel {
-  id        String        @id @default(uuid())
-  name      String
-  city      String
-  country   String
-  address   String
-  ratings   Float
-  price     String
-  brand     Brand?        @relation(fields: [brandID], references: [id])
-  brandID   String?
-  createdAt DateTime      @default(now())
-  updatedAt DateTime      @updatedAt
-  images    HotelImages[]
+  id                String        @id @default(uuid())
+  name              String
+  city              String
+  country           String
+  address           String
+  ratings           Float
+  number_of_ratings Int
+  price             Int
+  brand             Brand?        @relation(fields: [brandID], references: [id])
+  brandID           String?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  images            HotelImages[]
 }
 
 model HotelImages {

@@ -25,7 +25,7 @@ export const errorHandlerMiddleware = async (
 
       return res
         .status(StatusCodes.BAD_REQUEST)
-        .json({ errors: [{ message: "Email exists" }] });
+        .json({ errors: [{ message: "Unique constraint" }] });
     }
 
     return res

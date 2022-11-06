@@ -20,7 +20,16 @@ export const createHotelController = async (
   res: Response,
   next: NextFunction
 ) => {
-  const { name, city, country, address, ratings, price, brandID } = req.body;
+  const {
+    name,
+    city,
+    country,
+    address,
+    ratings,
+    price,
+    brandID,
+    number_of_ratings,
+  } = req.body;
 
   let featuredImage: { image: string; isMain: boolean };
   let otherImages: { image: string; isMain: boolean }[];
@@ -78,7 +87,15 @@ export const createHotelController = async (
     if (!brand) throw new BadRequestError(`Invalid brand ID`);
 
     hotel = await createHotelService(
-      { name, city, country, address, ratings: +ratings, price },
+      {
+        name,
+        city,
+        country,
+        address,
+        number_of_ratings: +number_of_ratings,
+        ratings: +ratings,
+        price: +price,
+      },
       images,
       brand.id
     );
@@ -89,8 +106,9 @@ export const createHotelController = async (
         city,
         country,
         address,
+        number_of_ratings: +number_of_ratings,
         ratings: +ratings,
-        price,
+        price: +price,
       },
       images
     );
@@ -104,7 +122,7 @@ export const getAllHotelController = async (req: Request, res: Response) => {
   const skip = (+page - 1) * +limit;
   let data: {
     hotels: Hotel[];
-    totalPages: number;
+    total: number;
   };
 
   if (orderBy == "price" || orderBy == "ratings") {
@@ -156,7 +174,10 @@ export const filterHotelByBrandController = async (
   req: Request,
   res: Response
 ) => {
+  const { page = 1, limit = 100 } = req.query;
+  const skip = (+page - 1) * +limit;
+
   const { brands } = req.body;
-  const data = await filterHotelByBrandService(brands);
+  const data = await filterHotelByBrandService(skip, +limit, brands);
   return successResponse(res, StatusCodes.OK, data);
 };

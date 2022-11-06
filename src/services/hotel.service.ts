@@ -12,7 +12,11 @@ export const createHotelService = async (
 ): Promise<Hotel> => {
   if (brandID)
     return await prisma.hotel.create({
-      data: { ...data, brandID, images: { create: images } },
+      data: {
+        ...data,
+        brand: { connect: { id: brandID } },
+        images: { create: images },
+      },
     });
 
   return await prisma.hotel.create({
@@ -24,7 +28,7 @@ export const getAllHotelService = async (
   skip: number,
   limit: number,
   orderBy?: "price" | "ratings"
-): Promise<{ hotels: Hotel[]; totalPages: number }> => {
+): Promise<{ hotels: Hotel[]; total: number }> => {
   if (orderBy == "price") {
     const hotels = await prisma.hotel.findMany({
       include: { images: { where: { isMain: true } } },
@@ -33,7 +37,7 @@ export const getAllHotelService = async (
       orderBy: { price: "desc" },
     });
     const count = await prisma.hotel.count();
-    return { hotels, totalPages: Math.ceil(count / limit) };
+    return { hotels, total: count };
   } else if (orderBy == "ratings") {
     const hotels = await prisma.hotel.findMany({
       include: { images: { where: { isMain: true } } },
@@ -42,7 +46,7 @@ export const getAllHotelService = async (
       orderBy: { ratings: "desc" },
     });
     const count = await prisma.hotel.count();
-    return { hotels, totalPages: Math.ceil(count / limit) };
+    return { hotels, total: count };
   } else {
     const hotels = await prisma.hotel.findMany({
       include: { images: { where: { isMain: true } } },
@@ -50,7 +54,7 @@ export const getAllHotelService = async (
       take: limit,
     });
     const count = await prisma.hotel.count();
-    return { hotels, totalPages: Math.ceil(count / limit) };
+    return { hotels, total: count };
   }
 };
 
@@ -71,10 +75,19 @@ export const deleteHotelService = async (id: string): Promise<void> => {
 };
 
 export const filterHotelByBrandService = async (
+  skip: number,
+  limit: number,
   brands: string[]
-): Promise<Hotel[]> => {
-  return await prisma.hotel.findMany({
+): Promise<{ hotels: Hotel[]; total: number }> => {
+  const total = await prisma.hotel.count({
     where: { brandID: { in: brands } },
+  });
+  const hotels = await prisma.hotel.findMany({
+    where: { brandID: { in: brands } },
+    skip,
+    take: limit,
     include: { images: { where: { isMain: true } } },
   });
+
+  return { hotels, total };
 };
