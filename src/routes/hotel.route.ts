@@ -9,11 +9,7 @@ import {
 } from "../controllers";
 import { validateRequestMiddleware } from "../helpers";
 import { hotelImagesUploader } from "../middleware";
-import {
-  createHotelSchema,
-  filterHotelByBrandSchema,
-  updateHotelSchema,
-} from "../schema";
+import { createHotelSchema, filterHotelByBrandSchema } from "../schema";
 
 const router = Router();
 
@@ -38,7 +34,7 @@ router
 router
   .route("/:hotelID")
   .get(getHotelController)
-  .patch(updateHotelSchema(), validateRequestMiddleware, updateHotelController)
+  .patch(updateHotelController)
   .delete(deleteHotelController);
 
 export { router as hotelRoutes };

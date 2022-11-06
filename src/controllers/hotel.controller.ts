@@ -76,7 +76,6 @@ export const createHotelController = async (
   );
 
   const images = [featuredImage, ...otherImages];
-  Logger.info({ images });
 
   let brand: Brand | null;
   let hotel: Hotel;

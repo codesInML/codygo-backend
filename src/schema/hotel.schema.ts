@@ -14,21 +14,6 @@ export const createHotelSchema = () => {
   ];
 };
 
-export const updateHotelSchema = () => {
-  return [
-    oneOf([
-      body("name").exists().isString(),
-      body("city").exists().isString(),
-      body("country").exists().isString(),
-      body("number_of_ratings").isString(),
-      body("address").exists().isString(),
-      body("price").exists().isString(),
-      body("ratings").exists().isString(),
-      body("brandID").exists().isString(),
-    ]),
-  ];
-};
-
 export const filterHotelByBrandSchema = () => {
   return [
     check("brands.*").isString().notEmpty(),
