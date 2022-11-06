@@ -31,7 +31,10 @@ export const getAllHotelService = async (
 ): Promise<{ hotels: Hotel[]; total: number }> => {
   if (orderBy == "price") {
     const hotels = await prisma.hotel.findMany({
-      include: { images: { where: { isMain: true } } },
+      include: {
+        images: { where: { isMain: true } },
+        brand: { select: { name: true } },
+      },
       skip,
       take: limit,
       orderBy: { price: "desc" },
@@ -40,7 +43,10 @@ export const getAllHotelService = async (
     return { hotels, total: count };
   } else if (orderBy == "ratings") {
     const hotels = await prisma.hotel.findMany({
-      include: { images: { where: { isMain: true } } },
+      include: {
+        images: { where: { isMain: true } },
+        brand: { select: { name: true } },
+      },
       skip,
       take: limit,
       orderBy: { ratings: "desc" },
@@ -49,7 +55,10 @@ export const getAllHotelService = async (
     return { hotels, total: count };
   } else {
     const hotels = await prisma.hotel.findMany({
-      include: { images: { where: { isMain: true } } },
+      include: {
+        images: { where: { isMain: true } },
+        brand: { select: { name: true } },
+      },
       skip,
       take: limit,
     });
@@ -77,17 +86,52 @@ export const deleteHotelService = async (id: string): Promise<void> => {
 export const filterHotelByBrandService = async (
   skip: number,
   limit: number,
-  brands: string[]
+  brands: string[],
+  orderBy?: string
 ): Promise<{ hotels: Hotel[]; total: number }> => {
-  const total = await prisma.hotel.count({
-    where: { brandID: { in: brands } },
-  });
-  const hotels = await prisma.hotel.findMany({
-    where: { brandID: { in: brands } },
-    skip,
-    take: limit,
-    include: { images: { where: { isMain: true } } },
-  });
-
-  return { hotels, total };
+  if (orderBy == "price") {
+    const total = await prisma.hotel.count({
+      where: { brandID: { in: brands } },
+    });
+    const hotels = await prisma.hotel.findMany({
+      where: { brandID: { in: brands } },
+      skip,
+      take: limit,
+      orderBy: { price: "desc" },
+      include: {
+        images: { where: { isMain: true } },
+        brand: { select: { name: true } },
+      },
+    });
+    return { hotels, total };
+  } else if (orderBy == "ratings") {
+    const total = await prisma.hotel.count({
+      where: { brandID: { in: brands } },
+    });
+    const hotels = await prisma.hotel.findMany({
+      where: { brandID: { in: brands } },
+      skip,
+      take: limit,
+      orderBy: { ratings: "desc" },
+      include: {
+        images: { where: { isMain: true } },
+        brand: { select: { name: true } },
+      },
+    });
+    return { hotels, total };
+  } else {
+    const total = await prisma.hotel.count({
+      where: { brandID: { in: brands } },
+    });
+    const hotels = await prisma.hotel.findMany({
+      where: { brandID: { in: brands } },
+      skip,
+      take: limit,
+      include: {
+        images: { where: { isMain: true } },
+        brand: { select: { name: true } },
+      },
+    });
+    return { hotels, total };
+  }
 };

@@ -174,10 +174,21 @@ export const filterHotelByBrandController = async (
   req: Request,
   res: Response
 ) => {
-  const { page = 1, limit = 100 } = req.query;
+  const { page = 1, limit = 100, orderBy } = req.query;
   const skip = (+page - 1) * +limit;
 
   const { brands } = req.body;
-  const data = await filterHotelByBrandService(skip, +limit, brands);
+
+  let data: {
+    hotels: Hotel[];
+    total: number;
+  };
+
+  if (orderBy == "price" || orderBy == "ratings") {
+    data = await getAllHotelService(skip, +limit, orderBy);
+    data = await filterHotelByBrandService(skip, +limit, brands, orderBy);
+  } else {
+    data = await filterHotelByBrandService(skip, +limit, brands);
+  }
   return successResponse(res, StatusCodes.OK, data);
 };
